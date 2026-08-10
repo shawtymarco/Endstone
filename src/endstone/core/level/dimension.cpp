@@ -107,8 +107,17 @@ std::vector<std::unique_ptr<Chunk>> EndstoneDimension::getLoadedChunks()
 
 bool EndstoneDimension::isChunkLoaded(int x, int z) const
 {
+    const auto resident = loaded_chunks_.find(chunkKey(x, z));
+    if (resident != loaded_chunks_.end()) {
+        return resident->second && resident->second->getState() >= ChunkState::Loaded;
+    }
     const auto chunk = getHandle().getChunkSource().getExistingChunk(ChunkPos(x, z));
     return chunk && chunk->getState() >= ChunkState::Loaded;
+}
+
+bool EndstoneDimension::isChunkKnown(int x, int z) const
+{
+    return getHandle().getChunkSource().isChunkKnown(ChunkPos(x, z));
 }
 
 bool EndstoneDimension::loadChunk(int x, int z)
