@@ -116,6 +116,35 @@ public:
     [[nodiscard]] virtual std::vector<std::unique_ptr<Chunk>> getLoadedChunks() = 0;
 
     /**
+     * @brief Checks if the Chunk at the given coordinates is loaded.
+     *
+     * @param x X-coordinate of the chunk
+     * @param z Z-coordinate of the chunk
+     * @return true if the chunk is loaded, otherwise false
+     */
+    [[nodiscard]] virtual bool isChunkLoaded(int x, int z) const = 0;
+
+    /**
+     * @brief Loads the Chunk at the given coordinates and keeps it resident.
+     *
+     * The resident hold lasts until unloadChunk() is called or the server restarts.
+     *
+     * @param x X-coordinate of the chunk
+     * @param z Z-coordinate of the chunk
+     * @return true if the chunk was loaded, otherwise false
+     */
+    virtual bool loadChunk(int x, int z) = 0;
+
+    /**
+     * @brief Releases the resident hold placed by loadChunk().
+     *
+     * @param x X-coordinate of the chunk
+     * @param z Z-coordinate of the chunk
+     * @return true once the hold has been released
+     */
+    virtual bool unloadChunk(int x, int z) = 0;
+
+    /**
      * @brief Drops an item at the specified Location
      *
      * @param location Location to drop the item

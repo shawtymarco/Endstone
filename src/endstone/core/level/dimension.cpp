@@ -27,6 +27,14 @@
 #include "endstone/core/level/level.h"
 
 namespace endstone::core {
+
+namespace {
+std::uint64_t chunkKey(int x, int z)
+{
+    return static_cast<std::uint64_t>(static_cast<std::uint32_t>(x)) << 32 | static_cast<std::uint32_t>(z);
+}
+}  // namespace
+
 EndstoneDimension::EndstoneDimension(WeakRef<::Dimension> dimension, EndstoneLevel &level)
     : dimension_(std::move(dimension)), level_(level)
 {
@@ -95,6 +103,29 @@ std::vector<std::unique_ptr<Chunk>> EndstoneDimension::getLoadedChunks()
         }
     }
     return chunks;
+}
+
+bool EndstoneDimension::isChunkLoaded(int x, int z) const
+{
+    const auto chunk = getHandle().getChunkSource().getExistingChunk(ChunkPos(x, z));
+    return chunk && chunk->getState() >= ChunkState::Loaded;
+}
+
+bool EndstoneDimension::loadChunk(int x, int z)
+{
+    auto chunk = getHandle().getChunkSource().getOrLoadChunk(ChunkPos(x, z), ::ChunkSource::LoadMode::None, false);
+    if (!chunk) {
+        return false;
+    }
+    loaded_chunks_[chunkKey(x, z)] = std::move(chunk);
+    return true;
+}
+
+bool EndstoneDimension::unloadChunk(int x, int z)
+{
+    loaded_chunks_.erase(chunkKey(x, z));
+    getHandle().flushLevelChunkGarbageCollector();
+    return true;
 }
 
 Item &EndstoneDimension::dropItem(const Location location, const ItemStack &item)
