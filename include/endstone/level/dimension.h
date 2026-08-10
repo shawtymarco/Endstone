@@ -125,13 +125,15 @@ public:
     [[nodiscard]] virtual bool isChunkLoaded(int x, int z) const = 0;
 
     /**
-     * @brief Loads the Chunk at the given coordinates and keeps it resident.
+     * @brief Requests the Chunk at the given coordinates to be loaded and keeps it resident.
      *
      * The resident hold lasts until unloadChunk() is called or the server restarts.
      *
      * @param x X-coordinate of the chunk
      * @param z Z-coordinate of the chunk
-     * @return true if the chunk was loaded, otherwise false
+     * Loading may complete on a later tick. Use isChunkLoaded() to verify readiness.
+     *
+     * @return true if the load request was accepted, otherwise false
      */
     virtual bool loadChunk(int x, int z) = 0;
 

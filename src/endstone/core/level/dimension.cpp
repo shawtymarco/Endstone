@@ -113,7 +113,8 @@ bool EndstoneDimension::isChunkLoaded(int x, int z) const
 
 bool EndstoneDimension::loadChunk(int x, int z)
 {
-    auto chunk = getHandle().getChunkSource().getOrLoadChunk(ChunkPos(x, z), ::ChunkSource::LoadMode::None, false);
+    auto chunk =
+        getHandle().getChunkSource().getOrLoadChunk(ChunkPos(x, z), ::ChunkSource::LoadMode::Deferred, false);
     if (!chunk) {
         return false;
     }
