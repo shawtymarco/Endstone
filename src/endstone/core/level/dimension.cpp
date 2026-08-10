@@ -120,6 +120,11 @@ bool EndstoneDimension::isChunkKnown(int x, int z) const
     return getHandle().getChunkSource().isChunkKnown(ChunkPos(x, z));
 }
 
+bool EndstoneDimension::isChunkSaved(int x, int z) const
+{
+    return getHandle().getChunkSource().isChunkSaved(ChunkPos(x, z));
+}
+
 bool EndstoneDimension::loadChunk(int x, int z)
 {
     auto chunk =

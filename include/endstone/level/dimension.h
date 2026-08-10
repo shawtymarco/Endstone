@@ -125,16 +125,22 @@ public:
     [[nodiscard]] virtual bool isChunkLoaded(int x, int z) const = 0;
 
     /**
-     * @brief Checks whether the Chunk has persisted data in the dimension's chunk source.
-     *
-     * A chunk can be unknown when a void world has never materialized it. Such chunks do not
-     * need a resident load until data is written to them.
+     * @brief Checks whether the dimension's chunk source knows the Chunk.
      *
      * @param x X-coordinate of the chunk
      * @param z Z-coordinate of the chunk
      * @return true if the chunk source knows the chunk, otherwise false
      */
     [[nodiscard]] virtual bool isChunkKnown(int x, int z) const = 0;
+
+    /**
+     * @brief Checks whether the Chunk has persisted data in the dimension's chunk storage.
+     *
+     * @param x X-coordinate of the chunk
+     * @param z Z-coordinate of the chunk
+     * @return true if the chunk is saved, otherwise false
+     */
+    [[nodiscard]] virtual bool isChunkSaved(int x, int z) const = 0;
 
     /**
      * @brief Requests the Chunk at the given coordinates to be loaded and keeps it resident.
