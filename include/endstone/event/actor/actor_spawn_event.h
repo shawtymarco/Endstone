@@ -19,6 +19,19 @@
 
 namespace endstone {
 
+enum class SpawnReason {
+    Unknown,
+    Natural,
+    SpawnEgg,
+    Command,
+    Dispenser,
+    Spawner,
+    Breeding,
+    Transformation,
+    Loaded,
+    Plugin,
+};
+
 /**
  * @brief Called when an Actor is spawned into a world.
  *
@@ -27,10 +40,16 @@ namespace endstone {
 class ActorSpawnEvent : public Cancellable<ActorEvent<Actor>> {
 public:
     ENDSTONE_EVENT(ActorSpawnEvent);
-    explicit ActorSpawnEvent(Actor &actor) : Cancellable(actor) {}
+    explicit ActorSpawnEvent(Actor &actor, SpawnReason reason = SpawnReason::Unknown)
+        : Cancellable(actor), reason_(reason)
+    {
+    }
     ~ActorSpawnEvent() override = default;
 
-    // TODO(event): add spawn cause
+    [[nodiscard]] SpawnReason getReason() const noexcept { return reason_; }
+
+private:
+    SpawnReason reason_;
 };
 
 }  // namespace endstone

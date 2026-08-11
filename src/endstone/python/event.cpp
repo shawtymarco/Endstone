@@ -25,6 +25,18 @@ void init_event(py::module_ &m, py::class_<Event> &event)
         .value("DEFAULT", EventResult::Default)
         .value("ALLOW", EventResult::Allow)
         .finalize();
+    py::native_enum<SpawnReason>(m, "SpawnReason", "enum.Enum")
+        .value("UNKNOWN", SpawnReason::Unknown)
+        .value("NATURAL", SpawnReason::Natural)
+        .value("SPAWN_EGG", SpawnReason::SpawnEgg)
+        .value("COMMAND", SpawnReason::Command)
+        .value("DISPENSER", SpawnReason::Dispenser)
+        .value("SPAWNER", SpawnReason::Spawner)
+        .value("BREEDING", SpawnReason::Breeding)
+        .value("TRANSFORMATION", SpawnReason::Transformation)
+        .value("LOADED", SpawnReason::Loaded)
+        .value("PLUGIN", SpawnReason::Plugin)
+        .finalize();
 
     event.def_property_readonly("event_name", &Event::getEventName, "Gets a user-friendly identifier for this event.")
         .def_property_readonly("is_asynchronous", &Event::isAsynchronous, "Whether the event fires asynchronously.");
@@ -105,11 +117,23 @@ void init_event(py::module_ &m, py::class_<Event> &event)
                                                                    "Called when a living entity receives knockback.")
         .def_property_readonly("source", &ActorKnockbackEvent::getSource, py::return_value_policy::reference,
                                "Get the source actor that has caused knockback to the defender, if exists.")
+        .def_property_readonly("source_location", &ActorKnockbackEvent::getSourceLocation,
+                               "Gets the known origin of the knockback, if exposed by the server.")
         .def_property("knockback", &ActorKnockbackEvent::getKnockback, &ActorKnockbackEvent::setKnockback,
                       "Gets or sets the knockback that will be applied to the entity.");
     py::class_<ActorRemoveEvent, ActorEvent<Actor>>(m, "ActorRemoveEvent", "Called when an Actor is removed.");
     py::class_<ActorSpawnEvent, ActorEvent<Actor>, ICancellable>(m, "ActorSpawnEvent",
-                                                                 "Called when an Actor is spawned into a world.");
+                                                                 "Called when an Actor is spawned into a world.")
+        .def_property_readonly("reason", &ActorSpawnEvent::getReason, "Gets the reason this actor was spawned.");
+    py::class_<ProjectileHitEvent, ActorEvent<Actor>, ICancellable>(
+        m, "ProjectileHitEvent", "Called when a projectile hits an actor or block.")
+        .def_property_readonly("projectile", &ProjectileHitEvent::getProjectile,
+                               py::return_value_policy::reference)
+        .def_property_readonly("hit_location", &ProjectileHitEvent::getHitLocation)
+        .def_property_readonly("hit_actor", &ProjectileHitEvent::getHitActor,
+                               py::return_value_policy::reference)
+        .def_property_readonly("hit_block", &ProjectileHitEvent::getHitBlock,
+                               py::return_value_policy::reference);
     py::class_<ActorTeleportEvent, ActorEvent<Actor>, ICancellable>(
         m, "ActorTeleportEvent", "Called when a non-player entity is teleported from one location to another.")
         .def_property("from_location", &ActorTeleportEvent::getFrom, &ActorTeleportEvent::setFrom,

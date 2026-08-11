@@ -100,6 +100,8 @@ public:
     int getNoActionTime() const;
     void resetNoActionTime();
     bool checkForPostHitDamageImmunity(float damage_difference, const ActorDamageSource &source);
+    [[nodiscard]] bool isNaturallySpawned() const noexcept { return naturally_spawned_; }
+    [[nodiscard]] MobSpawnMethod getSpawnMethod() const noexcept { return spawn_method_; }
 
 public:
     float hurt_dir;

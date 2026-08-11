@@ -15,10 +15,12 @@
 #pragma once
 
 #include <format>
+#include <optional>
 #include <string>
 #include <string_view>
 
 #include "endstone/actor/actor.h"
+#include "endstone/level/location.h"
 
 namespace endstone {
 
@@ -66,6 +68,11 @@ public:
      * @return true if is indirect, false otherwise.
      */
     [[nodiscard]] virtual bool isIndirect() const = 0;
+
+    /**
+     * @brief Gets the known source/origin location for this damage, if exposed by the server.
+     */
+    [[nodiscard]] virtual std::optional<Location> getSourceLocation() const { return std::nullopt; }
 };
 
 }  // namespace endstone

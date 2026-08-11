@@ -26,6 +26,7 @@
 #include "endstone/core/server.h"
 #include "endstone/event/actor/actor_damage_event.h"
 #include "endstone/event/actor/actor_knockback_event.h"
+#include "endstone/runtime/bedrock_hooks/explosion_context.h"
 #include "endstone/runtime/hook.h"
 
 void Mob::knockback(Actor *source, float damage, float dx, float dz, const KnockbackParameters &parameters)
@@ -36,9 +37,16 @@ void Mob::knockback(Actor *source, float damage, float dx, float dz, const Knock
     auto diff = after - before;
 
     const auto &server = endstone::core::EndstoneServer::getInstance();
+    std::optional<endstone::Location> source_location;
+    if (const auto &explosion = endstone::runtime::getLastExplosionPos(); explosion.has_value()) {
+        source_location.emplace(getEndstoneActor().getDimension(), explosion->x, explosion->y, explosion->z);
+    }
+    else if (source != nullptr) {
+        source_location = source->getEndstoneActor().getLocation();
+    }
     endstone::ActorKnockbackEvent e{getEndstoneActor<endstone::core::EndstoneMob>(),
                                     source == nullptr ? nullptr : &source->getEndstoneActor(),
-                                    {diff.x, diff.y, diff.z}};
+                                    {diff.x, diff.y, diff.z}, std::move(source_location)};
     server.getPluginManager().callEvent(e);
 
     const auto knockback = e.getKnockback();

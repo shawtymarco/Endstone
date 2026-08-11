@@ -14,6 +14,9 @@
 
 #pragma once
 
+#include <optional>
+#include <utility>
+
 #include "endstone/actor/mob.h"
 #include "endstone/event/actor/actor_event.h"
 #include "endstone/event/cancellable.h"
@@ -27,8 +30,10 @@ class ActorKnockbackEvent : public Cancellable<ActorEvent<Mob>> {
 public:
     ENDSTONE_EVENT(ActorKnockbackEvent);
 
-    explicit ActorKnockbackEvent(Mob &mob, Actor *source, Vector knockback)
-        : Cancellable(mob), mob_(mob), source_(source), knockback_(knockback)
+    explicit ActorKnockbackEvent(Mob &mob, Actor *source, Vector knockback,
+                                 std::optional<Location> source_location = std::nullopt)
+        : Cancellable(mob), mob_(mob), source_(source), knockback_(knockback),
+          source_location_(std::move(source_location))
     {
     }
 
@@ -38,6 +43,11 @@ public:
      * @return actor that caused knockback, or nullptr if the knockback is not caused by an actor.
      */
     [[nodiscard]] Actor *getSource() const { return source_; }
+
+    /**
+     * @brief Gets the known origin of the knockback, when the server exposes one.
+     */
+    [[nodiscard]] const std::optional<Location> &getSourceLocation() const noexcept { return source_location_; }
 
     /**
      * Gets the knockback that will be applied to the entity.
@@ -61,6 +71,7 @@ private:
     Actor *source_;
     Vector raw_knockback_;
     Vector knockback_;
+    std::optional<Location> source_location_;
 };
 
 }  // namespace endstone

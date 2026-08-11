@@ -14,8 +14,6 @@
 
 #include "bedrock/scripting/event_handlers/script_block_gameplay_handler.h"
 
-#include <optional>
-
 #include "bedrock/core/math/vec3.h"
 #include "bedrock/world/actor/actor.h"
 #include "endstone/block/block_face.h"
@@ -28,10 +26,7 @@
 #include "endstone/event/block/block_piston_event.h"
 #include "endstone/event/block/block_place_event.h"
 #include "endstone/runtime/vtable_hook.h"
-
-namespace endstone::runtime {
-const std::optional<Vec3> &getLastExplosionPos();
-}  // namespace endstone::runtime
+#include "endstone/runtime/bedrock_hooks/explosion_context.h"
 
 namespace {
 

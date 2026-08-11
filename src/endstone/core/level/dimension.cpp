@@ -14,6 +14,8 @@
 
 #include "endstone/core/level/dimension.h"
 
+#include "endstone/core/actor/spawn_reason.h"
+
 #include <ranges>
 
 #include <endstone/core/actor/item.h>
@@ -158,6 +160,7 @@ Actor *EndstoneDimension::spawnActor(Location location, std::string type)
     const auto id = ActorDefinitionIdentifier(type);
     auto entity = actor_factory.createSpawnedActor(id, nullptr, {location.getX(), location.getY(), location.getZ()},
                                                    {location.getPitch(), location.getYaw()});
+    const ScopedSpawnReason spawn_reason{SpawnReason::Plugin};
     const auto *actor =
         level_.getHandle().addEntity(getHandle().getBlockSourceFromMainChunkSource(), std::move(entity));
     if (!actor) {

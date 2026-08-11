@@ -21,18 +21,21 @@ namespace endstone::core {
 
 class EndstoneDamageSource : public DamageSource {
 public:
-    explicit EndstoneDamageSource(const ActorDamageSource &damage_source);
+    explicit EndstoneDamageSource(const ActorDamageSource &damage_source,
+                                  std::optional<Location> source_location = std::nullopt);
 
     [[nodiscard]] std::string_view getType() const override;
     [[nodiscard]] Actor *getActor() const override;
     [[nodiscard]] Actor *getDamagingActor() const override;
     [[nodiscard]] bool isIndirect() const override;
+    [[nodiscard]] std::optional<Location> getSourceLocation() const override;
 
 private:
     static std::string_view toEndstone(ActorDamageCause cause);
 
     const ActorDamageSource &damage_source_;
     std::string_view type_;
+    std::optional<Location> source_location_;
 };
 
 }  // namespace endstone::core

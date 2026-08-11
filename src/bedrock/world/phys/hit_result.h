@@ -27,7 +27,10 @@ enum class HitResultType : int {
 class HitResult {
 public:
     HitResult() = default;
+    [[nodiscard]] HitResultType getType() const noexcept { return type_; }
     [[nodiscard]] const BlockPos &getBlock() const { return block_; }
+    [[nodiscard]] const Vec3 &getPosition() const noexcept { return pos_; }
+    [[nodiscard]] const WeakEntityRef &getEntity() const noexcept { return entity_; }
 
 private:
     Vec3 start_pos_{Vec3::ZERO};

@@ -64,6 +64,7 @@ static_assert(_ITERATOR_DEBUG_LEVEL == 0,
 #include "event/actor/actor_knockback_event.h"
 #include "event/actor/actor_remove_event.h"
 #include "event/actor/actor_spawn_event.h"
+#include "event/actor/projectile_hit_event.h"
 #include "event/actor/actor_teleport_event.h"
 #include "event/actor/player_death_event.h"
 #include "event/block/block_break_event.h"

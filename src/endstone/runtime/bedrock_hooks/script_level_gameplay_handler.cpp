@@ -18,6 +18,7 @@
 #include "bedrock/world/actor/player/player.h"
 #include "bedrock/world/events/level_events.h"
 #include "endstone/core/actor/actor.h"
+#include "endstone/core/actor/spawn_reason.h"
 #include "endstone/core/entity/components/flag_components.h"
 #include "endstone/core/server.h"
 #include "endstone/event/actor/actor_spawn_event.h"
@@ -30,7 +31,8 @@ bool handleEvent(const LevelAddedActorEvent &event)
 {
     if (auto *actor = WeakEntityRef(event.actor).tryUnwrap<::Actor>(); actor && !actor->isPlayer()) {
         const auto &server = endstone::core::EndstoneServer::getInstance();
-        endstone::ActorSpawnEvent e{actor->getEndstoneActor()};
+        const auto *mob = WeakEntityRef(event.actor).tryUnwrap<::Mob>();
+        endstone::ActorSpawnEvent e{actor->getEndstoneActor(), endstone::core::resolveSpawnReason(*actor, mob)};
         server.getPluginManager().callEvent(e);
         if (e.isCancelled()) {
             actor->addOrRemoveComponent<endstone::core::InternalRemoveFlagComponent>(true);

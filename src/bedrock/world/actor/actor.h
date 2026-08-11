@@ -308,6 +308,7 @@ public:
     [[nodiscard]] const Vec2 &getRotationPrev() const;
     void setRotationWrapped(const Vec2 &);
     [[nodiscard]] ActorRuntimeID getRuntimeID() const;
+    [[nodiscard]] ActorInitializationMethod getInitializationMethod() const noexcept { return init_method_; }
     [[nodiscard]] ActorUniqueID getOrCreateUniqueID() const;
     [[nodiscard]] Actor *getVehicle() const;
     [[nodiscard]] bool isRiding() const;

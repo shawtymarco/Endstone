@@ -14,9 +14,8 @@
 
 #include "bedrock/world/level/explosion.h"
 
-#include <optional>
-
 #include "endstone/runtime/hook.h"
+#include "endstone/runtime/bedrock_hooks/explosion_context.h"
 
 namespace endstone::runtime {
 thread_local std::optional<Vec3> last_explosion_pos;

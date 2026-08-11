@@ -18,11 +18,20 @@
 #include "endstone/core/damage/damage_source.h"
 #include "endstone/core/server.h"
 
+#include <utility>
+
 namespace endstone::core {
 
-EndstoneDamageSource::EndstoneDamageSource(const ActorDamageSource &damage_source) : damage_source_(damage_source)
+EndstoneDamageSource::EndstoneDamageSource(const ActorDamageSource &damage_source,
+                                           std::optional<Location> source_location)
+    : damage_source_(damage_source), source_location_(std::move(source_location))
 {
     type_ = toEndstone(damage_source.getCause());
+    if (!source_location_.has_value()) {
+        if (const auto *actor = getDamagingActor(); actor != nullptr) {
+            source_location_ = actor->getLocation();
+        }
+    }
 }
 
 std::string_view EndstoneDamageSource::getType() const
@@ -51,6 +60,11 @@ Actor *EndstoneDamageSource::getDamagingActor() const
 bool EndstoneDamageSource::isIndirect() const
 {
     return getActor() != getDamagingActor();
+}
+
+std::optional<Location> EndstoneDamageSource::getSourceLocation() const
+{
+    return source_location_;
 }
 
 std::string_view EndstoneDamageSource::toEndstone(ActorDamageCause cause)
