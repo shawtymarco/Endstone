@@ -21,6 +21,10 @@ enum class BlockChangedEventTarget : std::uint8_t {
     NeighborBlock = 1,
 };
 
+class Actor;
+class ActorBlockSyncMessage;
+class Block;
+class BlockActor;
 class BlockSource;
 
 class BlockSourceListener {

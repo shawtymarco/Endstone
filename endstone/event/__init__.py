@@ -39,6 +39,7 @@ __getattr__, __dir__, __all__ = lazy.attach(
             "BlockPistonExtendEvent",
             "BlockPistonRetractEvent",
             "BlockPlaceEvent",
+            "BlockStateChangedEvent",
             "BroadcastMessageEvent",
             "Cancellable",
             "ChunkEvent",

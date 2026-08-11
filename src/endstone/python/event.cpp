@@ -210,6 +210,14 @@ void init_event(py::module_ &m, py::class_<Event> &event)
                                "Gets the block which was replaced.")
         .def_property_readonly("block_against", &BlockPlaceEvent::getBlockAgainst, py::return_value_policy::reference,
                                "Gets the block that this block was placed against");
+    py::class_<BlockStateChangedEvent, BlockEvent>(
+        m, "BlockStateChangedEvent", "Called after a block's runtime state has changed.")
+        .def_property_readonly("old_data", &BlockStateChangedEvent::getOldData, py::return_value_policy::reference,
+                               "Gets the immutable block data before the change.")
+        .def_property_readonly("new_data", &BlockStateChangedEvent::getNewData, py::return_value_policy::reference,
+                               "Gets the immutable block data after the change.")
+        .def_property_readonly("actor", &BlockStateChangedEvent::getActor, py::return_value_policy::reference,
+                               "Gets the actor associated with the change, if BDS supplied one.");
     py::class_<LeavesDecayEvent, BlockEvent, ICancellable>(
         m, "LeavesDecayEvent",
         "Called when leaves are decaying naturally.\nIf a Leaves Decay event is cancelled, the leaves will not decay.");

@@ -73,6 +73,7 @@ add_library(endstone_core
         inventory/item_type.cpp
         inventory/player_inventory.cpp
         lang/language.cpp
+        level/block_source_listener.cpp
         level/chunk.cpp
         level/dimension.cpp
         level/level.cpp

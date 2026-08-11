@@ -6,7 +6,7 @@ import enum
 
 from endstone import GameMode, Player, Skin
 from endstone.actor import Actor, Item, Mob
-from endstone.block import Block, BlockFace, BlockState
+from endstone.block import Block, BlockData, BlockFace, BlockState
 from endstone.command import CommandSender
 from endstone.damage import DamageSource
 from endstone.inventory import EquipmentSlot, ItemStack
@@ -36,6 +36,7 @@ __all__ = [
     "BlockPistonExtendEvent",
     "BlockPistonRetractEvent",
     "BlockPlaceEvent",
+    "BlockStateChangedEvent",
     "BroadcastMessageEvent",
     "Cancellable",
     "ChunkEvent",
@@ -438,6 +439,29 @@ class BlockPlaceEvent(BlockEvent, Cancellable):
     def block_against(self) -> Block:
         """
         Gets the block that this block was placed against
+        """
+        ...
+
+class BlockStateChangedEvent(BlockEvent):
+    """
+    Called after a block's runtime state has changed.
+    """
+    @property
+    def old_data(self) -> BlockData:
+        """
+        Gets the immutable block data before the change.
+        """
+        ...
+    @property
+    def new_data(self) -> BlockData:
+        """
+        Gets the immutable block data after the change.
+        """
+        ...
+    @property
+    def actor(self) -> Actor | None:
+        """
+        Gets the actor associated with the change, if BDS supplied one.
         """
         ...
 

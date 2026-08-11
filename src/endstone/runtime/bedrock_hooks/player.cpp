@@ -30,6 +30,7 @@
 #include "endstone/event/player/player_item_consume_event.h"
 #include "endstone/event/player/player_pickup_item_event.h"
 #include "endstone/event/player/player_teleport_event.h"
+#include "endstone/runtime/bedrock_hooks/player_teleport_event_context.h"
 #include "endstone/runtime/hook.h"
 
 void Player::teleportTo(const Vec3 &pos, bool should_stop_riding, int cause, int entity_type, bool keep_velocity)
@@ -38,6 +39,7 @@ void Player::teleportTo(const Vec3 &pos, bool should_stop_riding, int cause, int
     // - (for example, when PlayerMoveEvent is cancelled).
     if (hasComponent<endstone::core::InternalTeleportFlagComponent>()) {
         addOrRemoveComponent<endstone::core::InternalTeleportFlagComponent>(false);
+        const endstone::runtime::ScopedPlayerTeleportFallbackSuppression suppress_fallback;
         ENDSTONE_HOOK_CALL_ORIGINAL(&Player::teleportTo, this, pos, should_stop_riding, cause, entity_type,
                                     keep_velocity);
         return;
@@ -53,6 +55,7 @@ void Player::teleportTo(const Vec3 &pos, bool should_stop_riding, int cause, int
     }
 
     auto final_pos = Vec3(e.getTo().getX(), e.getTo().getY(), e.getTo().getZ());
+    const endstone::runtime::ScopedPlayerTeleportFallbackSuppression suppress_fallback;
     ENDSTONE_HOOK_CALL_ORIGINAL(&Player::teleportTo, this, final_pos, should_stop_riding, cause, entity_type,
                                 keep_velocity);
 }

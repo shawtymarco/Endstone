@@ -12,6 +12,7 @@
 #include "endstone/event/actor/actor_knockback_event.h"
 #include "endstone/event/actor/actor_spawn_event.h"
 #include "endstone/event/actor/projectile_hit_event.h"
+#include "endstone/event/block/block_state_changed_event.h"
 
 namespace {
 
@@ -30,6 +31,10 @@ static_assert(std::is_constructible_v<endstone::ActorKnockbackEvent, endstone::M
                                       endstone::Vector>);
 static_assert(std::is_constructible_v<endstone::ProjectileHitEvent, endstone::Actor &, endstone::Location,
                                       endstone::Actor *, std::unique_ptr<endstone::Block>>);
+static_assert(std::is_constructible_v<endstone::BlockStateChangedEvent, std::unique_ptr<endstone::Block>,
+                                      std::unique_ptr<endstone::BlockData>, std::unique_ptr<endstone::BlockData>,
+                                      endstone::Actor *>);
+static_assert(!std::is_base_of_v<endstone::ICancellable, endstone::BlockStateChangedEvent>);
 
 TEST(EventApiTest, LegacyDamageSourceDefaultsToUnknownLocation)
 {

@@ -23,6 +23,8 @@
 #include "endstone/core/server.h"
 #include "endstone/event/actor/actor_remove_event.h"
 #include "endstone/event/actor/actor_teleport_event.h"
+#include "endstone/event/player/player_teleport_event.h"
+#include "endstone/runtime/bedrock_hooks/player_teleport_event_context.h"
 #include "endstone/runtime/hook.h"
 
 using endstone::core::EndstoneActor;
@@ -34,7 +36,17 @@ using endstone::core::EndstoneServer;
 void Actor::teleportTo(const Vec3 &pos, bool should_stop_riding, int cause, int entity_type, bool keep_velocity)
 {
     Vec3 position = pos;
-    if (!isPlayer()) {
+    if (isPlayer() && !endstone::runtime::isPlayerTeleportFallbackSuppressed()) {
+        auto &server = EndstoneServer::getInstance();
+        auto &player = getEndstoneActor<EndstonePlayer>();
+        endstone::Location to{player.getDimension(), pos.x, pos.y, pos.z, getRotation().x, getRotation().y};
+        endstone::PlayerTeleportEvent e{player, player.getLocation(), to};
+        server.getPluginManager().callEvent(e);
+        if (e.isCancelled()) {
+            return;
+        }
+        position = {e.getTo().getX(), e.getTo().getY(), e.getTo().getZ()};
+    } else if (!isPlayer()) {
         auto &server = EndstoneServer::getInstance();
         auto &actor = getEndstoneActor();
         endstone::Location to{actor.getDimension(), pos.x, pos.y, pos.z, getRotation().x, getRotation().y};

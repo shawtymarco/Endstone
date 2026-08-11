@@ -26,10 +26,12 @@
 class LevelChunk;
 
 namespace endstone::core {
+class EndstoneBlockSourceListener;
+
 class EndstoneDimension : public Dimension {
 public:
     explicit EndstoneDimension(WeakRef<::Dimension> dimension, EndstoneLevel &level);
-    ~EndstoneDimension() override = default;
+    ~EndstoneDimension() override;
     [[nodiscard]] std::string getName() const override;
     [[nodiscard]] Type getType() const override;
     [[nodiscard]] Level &getLevel() const override;
@@ -53,6 +55,7 @@ public:
 private:
     WeakRef<::Dimension> dimension_;
     EndstoneLevel &level_;
+    std::unique_ptr<EndstoneBlockSourceListener> block_source_listener_;
     std::unordered_map<std::uint64_t, std::shared_ptr<::LevelChunk>> loaded_chunks_;
 };
 }  // namespace endstone::core

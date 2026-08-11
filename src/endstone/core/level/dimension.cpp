@@ -25,6 +25,7 @@
 #include "bedrock/world/level/block/bedrock_block_names.h"
 #include "bedrock/world/level/dimension/vanilla_dimensions.h"
 #include "endstone/core/block/block.h"
+#include "endstone/core/level/block_source_listener.h"
 #include "endstone/core/level/chunk.h"
 #include "endstone/core/level/level.h"
 
@@ -40,7 +41,11 @@ std::uint64_t chunkKey(int x, int z)
 EndstoneDimension::EndstoneDimension(WeakRef<::Dimension> dimension, EndstoneLevel &level)
     : dimension_(std::move(dimension)), level_(level)
 {
+    block_source_listener_ =
+        std::make_unique<EndstoneBlockSourceListener>(getHandle().getBlockSourceFromMainChunkSource());
 }
+
+EndstoneDimension::~EndstoneDimension() = default;
 
 std::string EndstoneDimension::getName() const
 {
