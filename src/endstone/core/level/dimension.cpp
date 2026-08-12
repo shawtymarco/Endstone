@@ -189,12 +189,37 @@ std::vector<Actor *> EndstoneDimension::getActors() const
     return result;
 }
 
+bool EndstoneDimension::isRedstoneTickingEnabled() const
+{
+    return redstone_tick_state_.isEnabled();
+}
+
+void EndstoneDimension::setRedstoneTickingEnabled(bool enabled)
+{
+    redstone_tick_state_.setEnabled(enabled);
+}
+
+Dimension::RedstoneTickMetrics EndstoneDimension::getRedstoneTickMetrics() const
+{
+    return redstone_tick_state_.snapshot();
+}
+
+void EndstoneDimension::resetRedstoneTickMetrics()
+{
+    redstone_tick_state_.reset();
+}
+
 ::Dimension &EndstoneDimension::getHandle() const
 {
     if (!dimension_.isSet()) {
         throw std::runtime_error("Trying to access a dimension that is no longer valid.");
     }
     return *dimension_.unwrap();
+}
+
+RedstoneTickState &EndstoneDimension::getRedstoneTickState() noexcept
+{
+    return redstone_tick_state_;
 }
 }  // namespace endstone::core
 

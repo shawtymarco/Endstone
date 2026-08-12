@@ -27,6 +27,21 @@ Location create_location(Dimension &dimension, float x, float y, float z, float 
 void init_level(py::module_ &m, py::class_<Level> &level, py::class_<Dimension> &dimension,
                 py::class_<Location> &location)
 {
+    py::class_<Dimension::RedstoneTickMetrics>(dimension, "RedstoneTickMetrics")
+        .def_property_readonly("executed_ticks",
+                               [](const Dimension::RedstoneTickMetrics &self) { return self.executed_ticks; })
+        .def_property_readonly("skipped_ticks",
+                               [](const Dimension::RedstoneTickMetrics &self) { return self.skipped_ticks; })
+        .def_property_readonly("total_duration_ns", [](const Dimension::RedstoneTickMetrics &self) {
+            return self.total_duration.count();
+        })
+        .def_property_readonly("last_duration_ns", [](const Dimension::RedstoneTickMetrics &self) {
+            return self.last_duration.count();
+        })
+        .def_property_readonly("maximum_duration_ns", [](const Dimension::RedstoneTickMetrics &self) {
+            return self.maximum_duration.count();
+        });
+
     py::class_<Chunk>(m, "Chunk", "Represents a chunk of blocks.")
         .def_property_readonly("x", &Chunk::getX, "Gets the X-coordinate of this chunk")
         .def_property_readonly("z", &Chunk::getZ, "Gets the Z-coordinate of this chunk")
@@ -65,7 +80,13 @@ void init_level(py::module_ &m, py::class_<Level> &level, py::class_<Dimension> 
         .def("spawn_actor", &Dimension::spawnActor, py::arg("location"), py::arg("type"),
              py::return_value_policy::reference, "Creates an actor at the given Location")
         .def_property_readonly("actors", &Dimension::getActors, py::return_value_policy::reference_internal,
-                               "Get a list of all actors in this dimension");
+                               "Get a list of all actors in this dimension")
+        .def_property("redstone_ticking_enabled", &Dimension::isRedstoneTickingEnabled,
+                      &Dimension::setRedstoneTickingEnabled, "Gets or sets whether redstone ticks run")
+        .def_property_readonly("redstone_tick_metrics", &Dimension::getRedstoneTickMetrics,
+                               "Gets redstone tick timing metrics")
+        .def("reset_redstone_tick_metrics", &Dimension::resetRedstoneTickMetrics,
+             "Resets redstone tick timing metrics");
 
     level.def_property_readonly("name", &Level::getName, "Gets the unique name of this level")
         .def_property_readonly("actors", &Level::getActors, "Get a list of all actors in this level",

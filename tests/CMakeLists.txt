@@ -25,6 +25,7 @@ add_executable(endstone_test
         test_cpp_plugin_loader.cpp
         test_logger_factory.cpp
         test_player_ban_list.cpp
+        test_redstone_tick_state.cpp
         test_scheduler.cpp
         test_service_manager.cpp
         test_thread_pool_executor.cpp

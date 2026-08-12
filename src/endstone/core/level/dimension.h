@@ -20,6 +20,7 @@
 
 #include "bedrock/world/level/dimension/dimension.h"
 #include "endstone/actor/actor.h"
+#include "endstone/core/level/redstone_tick_state.h"
 #include "endstone/core/server.h"
 #include "endstone/level/dimension.h"
 
@@ -49,13 +50,19 @@ public:
     [[nodiscard]] Item &dropItem(Location location, const ItemStack &item) override;
     [[nodiscard]] Actor *spawnActor(Location location, std::string type) override;
     [[nodiscard]] std::vector<Actor *> getActors() const override;
+    [[nodiscard]] bool isRedstoneTickingEnabled() const override;
+    void setRedstoneTickingEnabled(bool enabled) override;
+    [[nodiscard]] RedstoneTickMetrics getRedstoneTickMetrics() const override;
+    void resetRedstoneTickMetrics() override;
 
     [[nodiscard]] ::Dimension &getHandle() const;
+    [[nodiscard]] RedstoneTickState &getRedstoneTickState() noexcept;
 
 private:
     WeakRef<::Dimension> dimension_;
     EndstoneLevel &level_;
     std::unique_ptr<EndstoneBlockSourceListener> block_source_listener_;
     std::unordered_map<std::uint64_t, std::shared_ptr<::LevelChunk>> loaded_chunks_;
+    RedstoneTickState redstone_tick_state_;
 };
 }  // namespace endstone::core

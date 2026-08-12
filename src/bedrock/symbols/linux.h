@@ -11,7 +11,7 @@
 
 namespace endstone::runtime {
 
-static constexpr std::array<std::pair<std::string_view, std::size_t>, 61> symbols = {{
+static constexpr std::array<std::pair<std::string_view, std::size_t>, 62> symbols = {{
     {"BlockState::StateListNode::mHead", 245336464},
     {"Enchant::mEnchants", 245162480},
     {"getI18n::result", 243978864},
@@ -50,6 +50,8 @@ static constexpr std::array<std::pair<std::string_view, std::size_t>, 61> symbol
     {"_ZN18CraftingDataPacket18prepareFromRecipesERK7Recipesb", 134707376},
     // DedicatedServer
     {"_ZN15DedicatedServer5startERKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEERKN7Bedrock19ActivationArgumentsE", 71542176},
+    // Dimension
+    {"_ZN9Dimension12tickRedstoneEv", 202461760},
     // Explosion
     {"_ZN9Explosion7explodeER7IRandom", 202003792},
     // FurnaceBlockActor

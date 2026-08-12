@@ -471,6 +471,14 @@ rip_relative = true
 rip_offset = 1
 
 [[signatures]]
+name = "?tickRedstone@Dimension@@UEAAXXZ"
+relative = false
+extra = 0
+# Dimension::tickRedstone compares the circuit counter and rate, evaluates the
+# dimension-owned CircuitSystem when due, then advances the counter.
+pattern = "56 48 83 EC 20 8B 81 0C 02 00 00 3B 81 08 02 00 00 7C 23 48 8B 91 F0 00 00 00 48 85 D2 74 17"
+
+[[signatures]]
 name = "?_trySpreadTo@LiquidBlock@@IEBAXAEAVBlockSource@@AEBVBlockPos@@H1E@Z"
 relative = false
 extra = 0

@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <chrono>
+#include <cstdint>
 #include <format>
 #include <memory>
 #include <string>
@@ -39,6 +41,20 @@ public:
         Nether = 1,
         TheEnd = 2,
         Custom = 999
+    };
+
+    /**
+     * @brief Runtime statistics for this dimension's redstone tick hook.
+     *
+     * Executed ticks are calls forwarded to BDS. Skipped ticks are calls suppressed
+     * because redstone ticking was disabled through setRedstoneTickingEnabled().
+     */
+    struct RedstoneTickMetrics {
+        std::uint64_t executed_ticks{};
+        std::uint64_t skipped_ticks{};
+        std::chrono::nanoseconds total_duration{};
+        std::chrono::nanoseconds last_duration{};
+        std::chrono::nanoseconds maximum_duration{};
     };
 
     virtual ~Dimension() = default;
@@ -189,6 +205,29 @@ public:
      * @return A List of all actors currently residing in this dimension
      */
     [[nodiscard]] virtual std::vector<Actor *> getActors() const = 0;
+
+    /**
+     * @brief Checks whether BDS redstone ticks are enabled in this dimension.
+     */
+    [[nodiscard]] virtual bool isRedstoneTickingEnabled() const = 0;
+
+    /**
+     * @brief Enables or disables BDS redstone ticks in this dimension.
+     *
+     * Disabling this changes vanilla gameplay semantics: circuits stop updating until
+     * ticking is enabled again. The setting is runtime-only and is not persisted.
+     */
+    virtual void setRedstoneTickingEnabled(bool enabled) = 0;
+
+    /**
+     * @brief Gets a snapshot of this dimension's redstone tick metrics.
+     */
+    [[nodiscard]] virtual RedstoneTickMetrics getRedstoneTickMetrics() const = 0;
+
+    /**
+     * @brief Resets this dimension's redstone tick metrics.
+     */
+    virtual void resetRedstoneTickMetrics() = 0;
 };
 
 inline std::unique_ptr<Block> Location::getBlock() const

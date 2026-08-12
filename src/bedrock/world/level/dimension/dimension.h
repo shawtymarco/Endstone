@@ -72,7 +72,7 @@ public:
 
     virtual void init(const br::worldgen::StructureSetRegistry &) = 0;
     virtual void tick() = 0;
-    virtual void tickRedstone() = 0;
+    virtual void tickRedstone();
     [[nodiscard]] virtual std::unique_ptr<WorldGenerator> createGenerator(
         const br::worldgen::StructureSetRegistry &) = 0;
     virtual void upgradeLevelChunk(ChunkSource &, LevelChunk &, LevelChunk &) = 0;
