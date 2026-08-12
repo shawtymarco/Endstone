@@ -20,6 +20,7 @@
 #include "bedrock/entity/weak_entity_ref.h"
 #include "bedrock/server/commands/command_utils.h"
 #include "bedrock/world/actor/provider/actor_offset.h"
+#include "bedrock/world/actor/actor_types.h"
 #include "bedrock/world/level/dimension/vanilla_dimensions.h"
 #include "endstone/actor/actor.h"
 #include "endstone/core/level/dimension.h"
@@ -125,6 +126,13 @@ public:
     [[nodiscard]] std::string getType() const override { return getHandle().getActorIdentifier().getCanonicalName(); }
 
     [[nodiscard]] bool isHostile() const override { return getHandle().hasCategory(ActorCategory::Monster); }
+
+    [[nodiscard]] bool isProjectile() const override
+    {
+        const auto type = static_cast<std::underlying_type_t<ActorType>>(getHandle().getEntityTypeId());
+        const auto projectile = static_cast<std::underlying_type_t<ActorType>>(ActorType::Projectile);
+        return (type & projectile) == projectile;
+    }
 
     [[nodiscard]] std::uint64_t getRuntimeId() const override { return getHandle().getRuntimeID().raw_id; }
 

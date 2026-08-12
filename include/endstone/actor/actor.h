@@ -62,6 +62,13 @@ public:
     [[nodiscard]] virtual bool isHostile() const = 0;
 
     /**
+     * @brief Returns whether this actor belongs to BDS's projectile type category.
+     *
+     * @return True for projectile actors, false for other actors.
+     */
+    [[nodiscard]] virtual bool isProjectile() const = 0;
+
+    /**
      * Returns the runtime id for this actor
      *
      * @return Runtime id for this actor

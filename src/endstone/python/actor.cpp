@@ -23,6 +23,8 @@ void init_actor(py::module_ &m, py::class_<Actor, CommandSender> &actor, py::cla
     actor.def_property_readonly("type", &Actor::getType, "Gets the type of the actor.")
         .def_property_readonly("is_hostile", &Actor::isHostile,
                                "Returns whether this actor belongs to BDS's hostile monster category.")
+        .def_property_readonly("is_projectile", &Actor::isProjectile,
+                               "Returns whether this actor belongs to BDS's projectile type category.")
         .def_property_readonly("runtime_id", &Actor::getRuntimeId, "Returns the runtime id for this actor.")
         .def_property_readonly("location", &Actor::getLocation, "Gets the actor's current position.")
         .def_property_readonly("velocity", &Actor::getVelocity, "Gets this actor's current velocity.")
