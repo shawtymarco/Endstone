@@ -67,6 +67,11 @@ if (UNIX)
                     -DNM=${CMAKE_NM}
                     -DLIBRARY=$<TARGET_FILE:endstone_runtime>
                     -DSYMBOL=_ZN9Dimension12tickRedstoneEv
+                    -P ${CMAKE_CURRENT_SOURCE_DIR}/verify_dynamic_symbol.cmake
+            COMMAND ${CMAKE_COMMAND}
+                    -DNM=${CMAKE_NM}
+                    -DLIBRARY=$<TARGET_FILE:endstone_runtime>
+                    -DSYMBOL=_ZN22ServerCorrectionPolicy21shouldCorrectMovementER13EntityContextRK21PlayerAuthInputPacketmhb
                     -P ${CMAKE_CURRENT_SOURCE_DIR}/verify_dynamic_symbol.cmake)
     if (ENDSTONE_SEPARATE_DEBUG_INFO)
         add_custom_command(

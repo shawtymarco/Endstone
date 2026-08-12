@@ -171,6 +171,9 @@ public:
      */
     virtual void setMaxPlayers(int max_players) = 0;
 
+    [[nodiscard]] virtual bool isPlayerMovementCorrectionEnabled() const = 0;
+    virtual void setPlayerMovementCorrectionEnabled(bool enabled) = 0;
+
     /**
      * @brief Gets the player with the given UUID.
      *

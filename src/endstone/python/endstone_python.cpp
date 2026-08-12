@@ -316,6 +316,9 @@ void init_server(py::class_<Server> &server)
                                "Gets a list of all currently online players.")
         .def_property("max_players", &Server::getMaxPlayers, &Server::setMaxPlayers,
                       "The maximum amount of players which can login to this server.")
+        .def_property("player_movement_correction_enabled", &Server::isPlayerMovementCorrectionEnabled,
+                      &Server::setPlayerMovementCorrectionEnabled,
+                      "Whether divergent player movement is corrected by the server.")
         .def("get_player", py::overload_cast<std::string>(&Server::getPlayer, py::const_), py::arg("name").noconvert(),
              py::return_value_policy::reference, "Gets the player with the exact given name, case insensitive.")
         .def("get_player", py::overload_cast<UUID>(&Server::getPlayer, py::const_), py::arg("unique_id").noconvert(),

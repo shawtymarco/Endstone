@@ -523,6 +523,16 @@ void EndstoneServer::setMaxPlayers(int max_players)
     getServer().getMinecraft()->getServerNetworkHandler()->setMaxNumPlayers(max_players);
 }
 
+bool EndstoneServer::isPlayerMovementCorrectionEnabled() const
+{
+    return player_movement_correction_enabled_.load(std::memory_order_relaxed);
+}
+
+void EndstoneServer::setPlayerMovementCorrectionEnabled(bool enabled)
+{
+    player_movement_correction_enabled_.store(enabled, std::memory_order_relaxed);
+}
+
 Player *EndstoneServer::getPlayer(UUID id) const
 {
     if (auto *player = level_->getHandle().getPlayer(EndstoneUUID::toMinecraft(id))) {

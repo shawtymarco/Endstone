@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <chrono>
 #include <memory>
 #include <string>
@@ -80,6 +81,8 @@ public:
     [[nodiscard]] std::vector<Player *> getOnlinePlayers() const override;
     [[nodiscard]] int getMaxPlayers() const override;
     void setMaxPlayers(int max_players) override;
+    [[nodiscard]] bool isPlayerMovementCorrectionEnabled() const override;
+    void setPlayerMovementCorrectionEnabled(bool enabled) override;
     [[nodiscard]] Player *getPlayer(UUID id) const override;
     [[nodiscard]] Player *getPlayer(std::string name) const override;
 
@@ -171,6 +174,7 @@ private:
     float average_tps_[SharedConstants::TicksPerSecond] = {SharedConstants::TicksPerSecond};
     float current_usage_ = 0.0F;
     float average_usage_[SharedConstants::TicksPerSecond] = {0.0F};
+    std::atomic<bool> player_movement_correction_enabled_{true};
     // TODO(config): move the following the a separate class/struct
     bool allow_client_packs_ = false;
     bool log_commands_ = true;

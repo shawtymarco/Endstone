@@ -11,7 +11,7 @@
 
 namespace endstone::runtime {
 
-static constexpr std::array<std::pair<std::string_view, std::size_t>, 62> symbols = {{
+static constexpr std::array<std::pair<std::string_view, std::size_t>, 63> symbols = {{
     {"BlockState::StateListNode::mHead", 245336464},
     {"Enchant::mEnchants", 245162480},
     {"getI18n::result", 243978864},
@@ -103,6 +103,8 @@ static constexpr std::array<std::pair<std::string_view, std::size_t>, 62> symbol
     {"_ZN10SayCommand12_sendMessageERKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEERKNS0_8optionalIS6_EES8_RK21CommandOriginIdentityR5Level", 158263344},
     // ScriptModuleMinecraft::ScriptBlockUtils
     {"_ZN21ScriptModuleMinecraft16ScriptBlockUtils21createBlockDescriptorENSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEENS1_8optionalINS1_13unordered_mapIS7_NS1_7variantIJiS7_bEEENS1_4hashIS7_EENS1_8equal_toIS7_EENS5_INS1_4pairIKS7_SB_EEEEEEEE", 140797104},
+    // ServerCorrectionPolicy
+    {"_ZN22ServerCorrectionPolicy21shouldCorrectMovementER13EntityContextRK21PlayerAuthInputPacketmhb", 115390592},
     // ServerInstance
     {"_ZN14ServerInstance16initializeServerEO27ServerInstanceInitArguments", 161570560},
     // ServerNetworkHandler

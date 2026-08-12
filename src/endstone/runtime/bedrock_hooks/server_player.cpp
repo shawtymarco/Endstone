@@ -14,6 +14,7 @@
 
 #include "bedrock/server/server_player.h"
 
+#include "bedrock/entity/components/replay_state_policy.h"
 #include "endstone/core/actor/actor.h"
 #include "endstone/core/level/location.h"
 #include "endstone/core/player.h"
@@ -47,4 +48,17 @@ void ServerPlayer::changeDimension(DimensionType to_id)
     // request.to_position = Vec3::ZERO;
     // _setDimensionTransitionComponent(getDimensionId(), to_id, 300);
     // getLevel().requestPlayerChangeDimension(*this, std::move(request));
+}
+
+MovementCorrection ServerCorrectionPolicy::shouldCorrectMovement(EntityContext &context,
+                                                                  const PlayerAuthInputPacket &packet,
+                                                                  std::uint64_t server_tick,
+                                                                  std::uint8_t divergence_counter, bool teleporting)
+{
+    auto &server = endstone::core::EndstoneServer::getInstance();
+    if (!server.isPlayerMovementCorrectionEnabled()) {
+        return {CorrectionMethod::AcceptClient, packet.payload.pos};
+    }
+    return ENDSTONE_HOOK_CALL_ORIGINAL(&ServerCorrectionPolicy::shouldCorrectMovement, this, context, packet,
+                                       server_tick, divergence_counter, teleporting);
 }

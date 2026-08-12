@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include "bedrock/bedrock.h"
 #include "bedrock/entity/gamerefs_entity/entity_context.h"
 #include "bedrock/entity/utilities/movement_correction_interface.h"
 #include "bedrock/forward.h"
@@ -40,4 +41,9 @@ struct IReplayStatePolicy {
     [[nodiscard]] virtual MovementCorrection shouldCorrectMovement(EntityContext &, const PlayerAuthInputPacket &,
                                                                    uint64_t, uint8_t, bool) = 0;
     virtual void notifyOfExternalCorrection(uint64_t) = 0;
+};
+
+struct ServerCorrectionPolicy : IReplayStatePolicy {
+    ENDSTONE_HOOK MovementCorrection shouldCorrectMovement(EntityContext &, const PlayerAuthInputPacket &, uint64_t,
+                                                           uint8_t, bool) override;
 };

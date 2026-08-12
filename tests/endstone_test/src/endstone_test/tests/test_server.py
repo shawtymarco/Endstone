@@ -172,6 +172,18 @@ def test_max_players(server: Server) -> None:
     assert server.max_players == 100
 
 
+def test_player_movement_correction_toggle(server: Server) -> None:
+    """Verify movement correction can be enabled and disabled at runtime."""
+    original = server.player_movement_correction_enabled
+    try:
+        server.player_movement_correction_enabled = False
+        assert server.player_movement_correction_enabled is False
+        server.player_movement_correction_enabled = True
+        assert server.player_movement_correction_enabled is True
+    finally:
+        server.player_movement_correction_enabled = original
+
+
 def test_get_player_by_name(server: Server) -> None:
     """Test get_player with invalid name returns None."""
     assert server.get_player("nonexistent_player_xyz") is None

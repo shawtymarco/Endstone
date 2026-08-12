@@ -479,6 +479,12 @@ extra = 0
 pattern = "56 48 83 EC 20 8B 81 0C 02 00 00 3B 81 08 02 00 00 7C 23 48 8B 91 F0 00 00 00 48 85 D2 74 17"
 
 [[signatures]]
+name = "?shouldCorrectMovement@ServerCorrectionPolicy@@UEAA?AUMovementCorrection@@AEAVEntityContext@@AEBVPlayerAuthInputPacket@@_KE_N@Z"
+relative = false
+extra = 0
+pattern = "41 57 41 56 41 55 41 54 56 57 55 53 48 81 EC F8 00 00 00 44 0F 29 B4 24 E0 00 00 00 44 0F 29 AC 24 D0 00 00 00"
+
+[[signatures]]
 name = "?_trySpreadTo@LiquidBlock@@IEBAXAEAVBlockSource@@AEBVBlockPos@@H1E@Z"
 relative = false
 extra = 0
