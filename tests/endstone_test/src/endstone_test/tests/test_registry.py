@@ -2,6 +2,7 @@ import typing
 
 import pytest
 from endstone import Server
+from endstone.block import BlockType
 from endstone.enchantments import Enchantment
 from endstone.inventory import ItemType
 
@@ -50,6 +51,8 @@ def test_get_valid(server: Server, registry: typing.Type[T], key: str, expected:
         (Enchantment, "bogus_enchantment"),
         (ItemType, "not_an_item"),
         (ItemType, "bogus_item"),
+        (BlockType, "minecraft:wooden_axe"),
+        (BlockType, "bogus_block"),
     ],
 )
 def test_get_invalid(server: Server, registry: typing.Type[T], key: str):

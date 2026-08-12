@@ -14,7 +14,6 @@
 
 #include "endstone/core/registry.h"
 
-#include <format>
 #include <ranges>
 
 #include "bedrock/world/item/enchanting/enchant.h"
@@ -87,11 +86,9 @@ std::vector<Identifier<BlockType>> EndstoneRegistry<BlockType, ::BlockType>::ide
 }
 
 template <>
-const ::BlockType *EndstoneRegistry<BlockType, ::BlockType>::getMinecraft(Identifier<BlockType> id) const
+const ::BlockType *EndstoneRegistry<BlockType, ::BlockType>::getMinecraft(Identifier<BlockType>) const
 {
-    throw std::logic_error(std::format("EndstoneRegistry<BlockType>: cache is pre-populated, getMinecraft should not "
-                                       "be called (id: {})",
-                                       id));
+    return nullptr;
 }
 
 template <>
