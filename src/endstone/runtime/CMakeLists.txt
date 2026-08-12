@@ -60,6 +60,14 @@ if (UNIX)
     target_link_libraries(endstone_runtime PRIVATE libelf::libelf)
     target_link_options(endstone_runtime PRIVATE -g -Wl,--no-undefined,--exclude-libs,ALL)
     target_compile_options(endstone_runtime PRIVATE -O2 -DNDEBUG -g -fvisibility=hidden -fms-extensions -fno-delete-null-pointer-checks)
+    add_custom_command(
+            TARGET endstone_runtime
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+                    -DNM=${CMAKE_NM}
+                    -DLIBRARY=$<TARGET_FILE:endstone_runtime>
+                    -DSYMBOL=_ZN9Dimension12tickRedstoneEv
+                    -P ${CMAKE_CURRENT_SOURCE_DIR}/verify_dynamic_symbol.cmake)
     if (ENDSTONE_SEPARATE_DEBUG_INFO)
         add_custom_command(
                 TARGET endstone_runtime

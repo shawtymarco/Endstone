@@ -18,6 +18,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "bedrock/bedrock.h"
 #include "bedrock/forward.h"
 #include "bedrock/gamerefs/owner_ptr.h"
 #include "bedrock/network/packet.h"
@@ -72,7 +73,7 @@ public:
 
     virtual void init(const br::worldgen::StructureSetRegistry &) = 0;
     virtual void tick() = 0;
-    virtual void tickRedstone() = 0;
+    ENDSTONE_HOOK virtual void tickRedstone() = 0;
     [[nodiscard]] virtual std::unique_ptr<WorldGenerator> createGenerator(
         const br::worldgen::StructureSetRegistry &) = 0;
     virtual void upgradeLevelChunk(ChunkSource &, LevelChunk &, LevelChunk &) = 0;
