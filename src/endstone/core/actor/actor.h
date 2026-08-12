@@ -124,6 +124,8 @@ public:
 
     [[nodiscard]] std::string getType() const override { return getHandle().getActorIdentifier().getCanonicalName(); }
 
+    [[nodiscard]] bool isHostile() const override { return getHandle().hasCategory(ActorCategory::Monster); }
+
     [[nodiscard]] std::uint64_t getRuntimeId() const override { return getHandle().getRuntimeID().raw_id; }
 
     [[nodiscard]] Location getLocation() const override

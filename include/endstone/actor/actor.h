@@ -55,6 +55,13 @@ public:
     [[nodiscard]] virtual std::string getType() const = 0;
 
     /**
+     * @brief Returns whether this actor belongs to BDS's hostile monster category.
+     *
+     * @return True for hostile monsters, false for players, passive mobs, and other actors.
+     */
+    [[nodiscard]] virtual bool isHostile() const = 0;
+
+    /**
      * Returns the runtime id for this actor
      *
      * @return Runtime id for this actor
