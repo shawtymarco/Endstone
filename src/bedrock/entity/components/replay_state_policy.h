@@ -43,7 +43,7 @@ struct IReplayStatePolicy {
     virtual void notifyOfExternalCorrection(uint64_t) = 0;
 };
 
-struct ServerCorrectionPolicy : IReplayStatePolicy {
-    ENDSTONE_HOOK MovementCorrection shouldCorrectMovement(EntityContext &, const PlayerAuthInputPacket &, uint64_t,
-                                                           uint8_t, bool) override;
+struct ServerCorrectionPolicy {
+    ENDSTONE_HOOK virtual MovementCorrection shouldCorrectMovement(EntityContext &, const PlayerAuthInputPacket &,
+                                                                   uint64_t, uint8_t, bool);
 };
