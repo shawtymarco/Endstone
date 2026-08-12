@@ -22,6 +22,8 @@
 #include "bedrock/network/raknet_connector.h"
 #include "bedrock/network/server_network_system.h"
 #include "bedrock/server/server_instance.h"
+#include "bedrock/world/actor/player/player.h"
+#include "bedrock/world/level/level.h"
 #include "endstone/core/level/level.h"
 #include "endstone/core/map/map_view.h"
 #include "endstone/core/player.h"
@@ -32,6 +34,136 @@
 #include "endstone/runtime/hook.h"
 
 namespace {
+constexpr float RotationByteScale = 360.0F / 256.0F;
+
+bool readByte(std::string_view data, std::size_t &offset, std::uint8_t &value)
+{
+    if (offset >= data.size()) {
+        return false;
+    }
+    value = static_cast<std::uint8_t>(data[offset++]);
+    return true;
+}
+
+bool readUnsignedVarInt64(std::string_view data, std::size_t &offset, std::uint64_t &value)
+{
+    value = 0;
+    for (std::uint32_t shift = 0; shift < 64; shift += 7) {
+        std::uint8_t byte{};
+        if (!readByte(data, offset, byte)) {
+            return false;
+        }
+        value |= static_cast<std::uint64_t>(byte & 0x7FU) << shift;
+        if ((byte & 0x80U) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool skipOptionalField(std::string_view data, std::size_t &offset, std::size_t value_size)
+{
+    std::uint8_t present{};
+    if (!readByte(data, offset, present) || present > 1) {
+        return false;
+    }
+    if (present != 0) {
+        if (value_size > data.size() - offset) {
+            return false;
+        }
+        offset += value_size;
+    }
+    return true;
+}
+
+struct DeltaMovementHeader {
+    std::uint64_t runtime_id{};
+    bool on_ground{};
+    bool force_move{};
+    bool force_move_local_entity{};
+    bool force_completion{};
+};
+
+std::optional<DeltaMovementHeader> readDeltaMovementHeader(std::string_view payload)
+{
+    DeltaMovementHeader result;
+    std::size_t offset{};
+    if (!readUnsignedVarInt64(payload, offset, result.runtime_id)) {
+        return std::nullopt;
+    }
+    for (int index = 0; index < 3; ++index) {
+        if (!skipOptionalField(payload, offset, sizeof(float))) {
+            return std::nullopt;
+        }
+    }
+    for (int index = 0; index < 3; ++index) {
+        if (!skipOptionalField(payload, offset, sizeof(std::uint8_t))) {
+            return std::nullopt;
+        }
+    }
+    std::uint8_t on_ground{};
+    std::uint8_t force_move{};
+    std::uint8_t force_move_local_entity{};
+    std::uint8_t force_completion{};
+    if (!readByte(payload, offset, on_ground) || !readByte(payload, offset, force_move) ||
+        !readByte(payload, offset, force_move_local_entity) || !readByte(payload, offset, force_completion) ||
+        offset != payload.size() || on_ground > 1 || force_move > 1 || force_move_local_entity > 1 ||
+        force_completion > 1) {
+        return std::nullopt;
+    }
+    result.on_ground = on_ground != 0;
+    result.force_move = force_move != 0;
+    result.force_move_local_entity = force_move_local_entity != 0;
+    result.force_completion = force_completion != 0;
+    return result;
+}
+
+void writeRotationByte(BinaryStream &stream, float rotation)
+{
+    const auto truncated = static_cast<std::int32_t>(rotation / RotationByteScale);
+    stream.writeByte(static_cast<std::uint8_t>(static_cast<std::uint32_t>(truncated) & 0xFFU), "Rotation", nullptr);
+}
+
+std::optional<std::string> makeAbsolutePlayerMovement(std::string_view payload, endstone::Player *observer)
+{
+    if (observer == nullptr) {
+        return std::nullopt;
+    }
+    const auto movement = readDeltaMovementHeader(payload);
+    if (!movement.has_value() || movement->runtime_id == observer->getRuntimeId()) {
+        return std::nullopt;
+    }
+
+    auto &server = endstone::core::EndstoneServer::getInstance();
+    auto *level = server.getEndstoneLevel();
+    if (level == nullptr) {
+        return std::nullopt;
+    }
+    auto *moving_player = level->getHandle().getRuntimePlayer(ActorRuntimeID{movement->runtime_id});
+    if (moving_player == nullptr) {
+        return std::nullopt;
+    }
+
+    std::uint8_t flags{};
+    flags |= movement->on_ground ? 0x01U : 0;
+    flags |= movement->force_move ? 0x02U : 0;
+    flags |= movement->force_move_local_entity ? 0x04U : 0;
+    flags |= movement->force_completion ? 0x08U : 0;
+    const auto &[x, y, z] = moving_player->getPosition();
+    const auto &[pitch, yaw] = moving_player->getRotation();
+
+    BinaryStream out;
+    out.writeUnsignedVarInt64(movement->runtime_id, "Actor Runtime ID", nullptr);
+    out.writeByte(flags, "Flags", nullptr);
+    out.writeFloat(x, "Position X", nullptr);
+    out.writeFloat(y, "Position Y", nullptr);
+    out.writeFloat(z, "Position Z", nullptr);
+    writeRotationByte(out, pitch);
+    writeRotationByte(out, yaw);
+    writeRotationByte(out, yaw);
+    return out.getBuffer();
+}
+
 void patchPacket(const StartGamePacket &packet)
 {
     const auto &server = endstone::core::EndstoneServer::getInstance();
@@ -158,6 +290,16 @@ void BatchedNetworkPeer::sendPacket(const std::string &data, Reliability reliabi
 
     // Create packet send event
     auto payload = stream.getView().substr(stream.getReadPointer());
+    std::optional<std::string> replacement_payload;
+    if (header.getPacketId() == MinecraftPacketIds::MoveDeltaActor &&
+        server.isPlayerMovementBroadcastAbsoluteEnabled()) {
+        replacement_payload = makeAbsolutePlayerMovement(payload, player);
+        if (replacement_payload.has_value()) {
+            header = PacketHeader{header.getRecipientSubId(), MinecraftPacketIds::MoveAbsoluteActor,
+                                  header.getSenderSubId()};
+            payload = *replacement_payload;
+        }
+    }
     endstone::PacketSendEvent e{player, static_cast<int>(header.getPacketId()), payload,
                                 endstone::core::EndstoneSocketAddress::fromNetworkIdentifier(id),
                                 static_cast<int>(header.getSenderSubId())};
@@ -199,7 +341,7 @@ void BatchedNetworkPeer::sendPacket(const std::string &data, Reliability reliabi
         return;
     }
 
-    if (e.getPayload().data() != payload.data()) {
+    if (replacement_payload.has_value() || e.getPayload().data() != payload.data()) {
         BinaryStream out;
         header.write(out);
         out.writeRawBytes(e.getPayload());

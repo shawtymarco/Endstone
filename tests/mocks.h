@@ -41,6 +41,8 @@ public:
     MOCK_METHOD(void, setMaxPlayers, (int), (override));
     MOCK_METHOD(bool, isPlayerMovementCorrectionEnabled, (), (const, override));
     MOCK_METHOD(void, setPlayerMovementCorrectionEnabled, (bool), (override));
+    MOCK_METHOD(bool, isPlayerMovementBroadcastAbsoluteEnabled, (), (const, override));
+    MOCK_METHOD(void, setPlayerMovementBroadcastAbsoluteEnabled, (bool), (override));
     MOCK_METHOD(endstone::Player *, getPlayer, (endstone::UUID), (const, override));
     MOCK_METHOD(endstone::Player *, getPlayer, (std::string), (const, override));
     MOCK_METHOD(int, getPort, (), (const, override));

@@ -533,6 +533,16 @@ void EndstoneServer::setPlayerMovementCorrectionEnabled(bool enabled)
     player_movement_correction_enabled_.store(enabled, std::memory_order_relaxed);
 }
 
+bool EndstoneServer::isPlayerMovementBroadcastAbsoluteEnabled() const
+{
+    return player_movement_broadcast_absolute_enabled_.load(std::memory_order_relaxed);
+}
+
+void EndstoneServer::setPlayerMovementBroadcastAbsoluteEnabled(bool enabled)
+{
+    player_movement_broadcast_absolute_enabled_.store(enabled, std::memory_order_relaxed);
+}
+
 Player *EndstoneServer::getPlayer(UUID id) const
 {
     if (auto *player = level_->getHandle().getPlayer(EndstoneUUID::toMinecraft(id))) {

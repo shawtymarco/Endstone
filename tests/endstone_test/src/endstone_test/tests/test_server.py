@@ -184,6 +184,18 @@ def test_player_movement_correction_toggle(server: Server) -> None:
         server.player_movement_correction_enabled = original
 
 
+def test_player_movement_broadcast_absolute_toggle(server: Server) -> None:
+    """Verify observer movement packet mode can be changed at runtime."""
+    original = server.player_movement_broadcast_absolute_enabled
+    try:
+        server.player_movement_broadcast_absolute_enabled = True
+        assert server.player_movement_broadcast_absolute_enabled is True
+        server.player_movement_broadcast_absolute_enabled = False
+        assert server.player_movement_broadcast_absolute_enabled is False
+    finally:
+        server.player_movement_broadcast_absolute_enabled = original
+
+
 def test_get_player_by_name(server: Server) -> None:
     """Test get_player with invalid name returns None."""
     assert server.get_player("nonexistent_player_xyz") is None

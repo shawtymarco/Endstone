@@ -83,6 +83,8 @@ public:
     void setMaxPlayers(int max_players) override;
     [[nodiscard]] bool isPlayerMovementCorrectionEnabled() const override;
     void setPlayerMovementCorrectionEnabled(bool enabled) override;
+    [[nodiscard]] bool isPlayerMovementBroadcastAbsoluteEnabled() const override;
+    void setPlayerMovementBroadcastAbsoluteEnabled(bool enabled) override;
     [[nodiscard]] Player *getPlayer(UUID id) const override;
     [[nodiscard]] Player *getPlayer(std::string name) const override;
 
@@ -175,6 +177,7 @@ private:
     float current_usage_ = 0.0F;
     float average_usage_[SharedConstants::TicksPerSecond] = {0.0F};
     std::atomic<bool> player_movement_correction_enabled_{true};
+    std::atomic<bool> player_movement_broadcast_absolute_enabled_{false};
     // TODO(config): move the following the a separate class/struct
     bool allow_client_packs_ = false;
     bool log_commands_ = true;

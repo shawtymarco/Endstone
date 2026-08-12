@@ -175,6 +175,22 @@ public:
     virtual void setPlayerMovementCorrectionEnabled(bool enabled) = 0;
 
     /**
+     * @brief Gets whether remote player movement broadcasts use absolute position packets.
+     *
+     * @return True when player movement broadcasts are converted to absolute updates.
+     */
+    [[nodiscard]] virtual bool isPlayerMovementBroadcastAbsoluteEnabled() const = 0;
+
+    /**
+     * @brief Sets whether remote player movement broadcasts use absolute position packets.
+     *
+     * This affects packets sent to observers and does not change server movement validation.
+     *
+     * @param enabled True to convert remote player movement broadcasts to absolute updates.
+     */
+    virtual void setPlayerMovementBroadcastAbsoluteEnabled(bool enabled) = 0;
+
+    /**
      * @brief Gets the player with the given UUID.
      *
      * @param id UUID of the player to retrieve
