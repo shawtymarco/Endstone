@@ -21,6 +21,7 @@
 #include "bedrock/network/packet/start_game_packet.h"
 #include "bedrock/network/raknet_connector.h"
 #include "bedrock/network/server_network_system.h"
+#include "bedrock/network/spatial_actor_network_data.h"
 #include "bedrock/server/server_instance.h"
 #include "bedrock/world/actor/player/player.h"
 #include "bedrock/world/level/level.h"
@@ -34,8 +35,6 @@
 #include "endstone/runtime/hook.h"
 
 namespace {
-constexpr float RotationByteScale = 360.0F / 256.0F;
-
 bool readByte(std::string_view data, std::size_t &offset, std::uint8_t &value)
 {
     if (offset >= data.size()) {
@@ -118,19 +117,14 @@ std::optional<DeltaMovementHeader> readDeltaMovementHeader(std::string_view payl
     return result;
 }
 
-void writeRotationByte(BinaryStream &stream, float rotation)
-{
-    const auto truncated = static_cast<std::int32_t>(rotation / RotationByteScale);
-    stream.writeByte(static_cast<std::uint8_t>(static_cast<std::uint32_t>(truncated) & 0xFFU), "Rotation", nullptr);
-}
-
 std::optional<std::string> makeAbsolutePlayerMovement(std::string_view payload, endstone::Player *observer)
 {
     if (observer == nullptr) {
         return std::nullopt;
     }
     const auto movement = readDeltaMovementHeader(payload);
-    if (!movement.has_value() || movement->runtime_id == observer->getRuntimeId()) {
+    if (!movement.has_value() || movement->runtime_id == observer->getRuntimeId() || !movement->on_ground ||
+        movement->force_move || movement->force_move_local_entity || movement->force_completion) {
         return std::nullopt;
     }
 
@@ -140,27 +134,26 @@ std::optional<std::string> makeAbsolutePlayerMovement(std::string_view payload, 
         return std::nullopt;
     }
     auto *moving_player = level->getHandle().getRuntimePlayer(ActorRuntimeID{movement->runtime_id});
-    if (moving_player == nullptr) {
+    if (moving_player == nullptr || moving_player->network_data == nullptr ||
+        !moving_player->network_data->has_initialized_last_sent) {
         return std::nullopt;
     }
 
-    std::uint8_t flags{};
-    flags |= movement->on_ground ? 0x01U : 0;
-    flags |= movement->force_move ? 0x02U : 0;
-    flags |= movement->force_move_local_entity ? 0x04U : 0;
-    flags |= movement->force_completion ? 0x08U : 0;
-    const auto &[x, y, z] = moving_player->getPosition();
-    const auto &[pitch, yaw] = moving_player->getRotation();
+    const auto &last_sent = moving_player->network_data->last_sent_move_data;
+    if (last_sent.runtime_id.raw_id != movement->runtime_id || !last_sent.header.is_on_ground ||
+        last_sent.header.force_move || last_sent.header.force_move_local_entity || last_sent.header.force_completion) {
+        return std::nullopt;
+    }
 
     BinaryStream out;
     out.writeUnsignedVarInt64(movement->runtime_id, "Actor Runtime ID", nullptr);
-    out.writeByte(flags, "Flags", nullptr);
-    out.writeFloat(x, "Position X", nullptr);
-    out.writeFloat(y, "Position Y", nullptr);
-    out.writeFloat(z, "Position Z", nullptr);
-    writeRotationByte(out, pitch);
-    writeRotationByte(out, yaw);
-    writeRotationByte(out, yaw);
+    out.writeByte(0x01U, "Flags", nullptr);
+    out.writeFloat(last_sent.pos.x, "Position X", nullptr);
+    out.writeFloat(last_sent.pos.y, "Position Y", nullptr);
+    out.writeFloat(last_sent.pos.z, "Position Z", nullptr);
+    out.writeSignedByte(last_sent.rot_x, "Pitch", nullptr);
+    out.writeSignedByte(last_sent.rot_y, "Yaw", nullptr);
+    out.writeSignedByte(last_sent.rot_y_head, "Head Yaw", nullptr);
     return out.getBuffer();
 }
 
