@@ -43,6 +43,7 @@ __all__ = [
     "ChunkLoadEvent",
     "ChunkUnloadEvent",
     "DimensionEvent",
+    "DimensionLoadEvent",
     "Event",
     "EventPriority",
     "EventResult",
@@ -492,6 +493,11 @@ class DimensionEvent(LevelEvent):
         Gets the dimension primarily involved with this event
         """
         ...
+
+class DimensionLoadEvent(DimensionEvent):
+    """
+    Called when a dimension is loaded
+    """
 
 class ChunkEvent(DimensionEvent):
     """

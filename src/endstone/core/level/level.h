@@ -45,7 +45,7 @@ public:
     [[nodiscard]] ::Level &getHandle() const;
 
 private:
-    void addDimension(::Dimension &dimension);
+    Dimension &addDimension(::Dimension &dimension);
 
     EndstoneServer &server_;
     ::Level &level_;

@@ -24,6 +24,8 @@
 #include "bedrock/world/level/level.h"
 #include "endstone/core/actor/actor.h"
 #include "endstone/core/level/dimension.h"
+#include "endstone/core/server.h"
+#include "endstone/event/level/dimension_load_event.h"
 #include "endstone/level/dimension.h"
 
 namespace endstone::core {
@@ -39,12 +41,20 @@ EndstoneLevel::EndstoneLevel(::Level &level) : server_(EndstoneServer::getInstan
         return true;
     });
     level.getDimensionManager().getOnNewDimensionCreatedConnector().connect(
-        [&](::Dimension &dimension) { addDimension(dimension); }, Bedrock::PubSub::ConnectPosition::AtBack, nullptr);
+        [&](::Dimension &dimension) {
+            auto &endstone_dimension = addDimension(dimension);
+            DimensionLoadEvent event(endstone_dimension);
+            server_.getPluginManager().callEvent(event);
+        },
+        Bedrock::PubSub::ConnectPosition::AtBack, nullptr);
 }
 
-void EndstoneLevel::addDimension(::Dimension &dimension)
+Dimension &EndstoneLevel::addDimension(::Dimension &dimension)
 {
-    dimensions_[dimension.getDimensionId().value] = std::make_unique<EndstoneDimension>(dimension.getWeakRef(), *this);
+    auto endstone_dimension = std::make_unique<EndstoneDimension>(dimension.getWeakRef(), *this);
+    auto *result = endstone_dimension.get();
+    dimensions_[dimension.getDimensionId().value] = std::move(endstone_dimension);
+    return *result;
 }
 
 std::string EndstoneLevel::getName() const

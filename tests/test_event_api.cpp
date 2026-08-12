@@ -13,6 +13,7 @@
 #include "endstone/event/actor/actor_spawn_event.h"
 #include "endstone/event/actor/projectile_hit_event.h"
 #include "endstone/event/block/block_state_changed_event.h"
+#include "endstone/event/level/dimension_load_event.h"
 
 namespace {
 
@@ -35,6 +36,7 @@ static_assert(std::is_constructible_v<endstone::BlockStateChangedEvent, std::uni
                                       std::unique_ptr<endstone::BlockData>, std::unique_ptr<endstone::BlockData>,
                                       endstone::Actor *>);
 static_assert(!std::is_base_of_v<endstone::ICancellable, endstone::BlockStateChangedEvent>);
+static_assert(std::is_constructible_v<endstone::DimensionLoadEvent, endstone::Dimension &>);
 
 TEST(EventApiTest, LegacyDamageSourceDefaultsToUnknownLocation)
 {
