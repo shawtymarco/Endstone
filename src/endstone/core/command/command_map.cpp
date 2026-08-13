@@ -332,16 +332,13 @@ bool EndstoneCommandMap::registerCommand(std::shared_ptr<Command> command)
 
                     const auto values_match = registered_values.size() == parameter.values.size() &&
                                               std::ranges::all_of(parameter.values, [&](const auto &value) {
-                                                  const auto value_it = registry.enum_value_lookup_.find(value);
-                                                  if (value_it == registry.enum_value_lookup_.end()) {
-                                                      return false;
-                                                  }
-                                                  const auto symbol = CommandRegistry::Symbol::fromEnumValueIndex(
-                                                                          value_it->second)
-                                                                          .value();
-                                                  return std::ranges::any_of(
-                                                      registered_values,
-                                                      [symbol](const auto &entry) { return entry.first == symbol; });
+                                                  return std::ranges::any_of(registered_values, [&](const auto &entry) {
+                                                      const auto value_index = CommandRegistry::Symbol(
+                                                                                   static_cast<std::size_t>(entry.first))
+                                                                                   .toIndex();
+                                                      return value_index < registry.enum_values_.size() &&
+                                                             registry.enum_values_.at(value_index) == value;
+                                                  });
                                               });
                     if (values_match) {
                         reuse_existing = true;
