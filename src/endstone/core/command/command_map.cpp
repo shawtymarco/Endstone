@@ -313,8 +313,11 @@ bool EndstoneCommandMap::registerCommand(std::shared_ptr<Command> command)
             if (parameter.is_enum) {
                 const auto &enum_name = parameter.type;
 
-                // Add suffix if the enum already exists
+                // Reuse an existing enum when both its name and values match. Commands commonly use the same
+                // discriminator enum across overloads, and registering a distinct enum for each overload prevents
+                // Bedrock from backtracking to another overload after the discriminator has matched.
                 std::string enum_name_final = enum_name;
+                bool reuse_existing = false;
                 int i = 0;
                 while (true) {
                     const auto it = registry.enum_lookup_.find(enum_name_final);
@@ -322,7 +325,26 @@ bool EndstoneCommandMap::registerCommand(std::shared_ptr<Command> command)
                         break;
                     }
                     const auto enum_index = it->second;
-                    if (registry.enums_.at(enum_index).values.empty()) {
+                    const auto &registered_values = registry.enums_.at(enum_index).values;
+                    if (registered_values.empty()) {
+                        break;
+                    }
+
+                    const auto values_match = registered_values.size() == parameter.values.size() &&
+                                              std::ranges::all_of(parameter.values, [&](const auto &value) {
+                                                  const auto value_it = registry.enum_value_lookup_.find(value);
+                                                  if (value_it == registry.enum_value_lookup_.end()) {
+                                                      return false;
+                                                  }
+                                                  const auto symbol = CommandRegistry::Symbol::fromEnumValueIndex(
+                                                                          value_it->second)
+                                                                          .value();
+                                                  return std::ranges::any_of(
+                                                      registered_values,
+                                                      [symbol](const auto &entry) { return entry.first == symbol; });
+                                              });
+                    if (values_match) {
+                        reuse_existing = true;
                         break;
                     }
                     enum_name_final = std::format("{}_{}", enum_name, ++i);
@@ -332,8 +354,11 @@ bool EndstoneCommandMap::registerCommand(std::shared_ptr<Command> command)
                                                 enum_name_final);
                 }
 
-                // Add enum
-                auto symbol = registry.addEnumValues(enum_name_final, parameter.values);
+                const auto symbol = reuse_existing
+                                        ? CommandRegistry::Symbol::fromEnumIndex(
+                                              registry.enum_lookup_.at(enum_name_final))
+                                              .value()
+                                        : registry.addEnumValues(enum_name_final, parameter.values);
 
                 // Check if the enum has been added
                 auto it = registry.enum_lookup_.find(enum_name_final);
