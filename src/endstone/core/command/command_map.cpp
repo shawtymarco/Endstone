@@ -289,6 +289,7 @@ bool EndstoneCommandMap::registerCommand(std::shared_ptr<Command> command)
         usages.push_back("/" + name);
     }
     std::vector<std::vector<CommandParameterData>> pending_param_data;
+    std::unordered_map<std::string, std::vector<std::string>> command_enum_values;
     for (const auto &usage : usages) {
         auto parser = CommandUsageParser(usage);
         auto result = parser.parse();
@@ -325,23 +326,13 @@ bool EndstoneCommandMap::registerCommand(std::shared_ptr<Command> command)
                         break;
                     }
                     const auto enum_index = it->second;
-                    const auto &registered_values = registry.enums_.at(enum_index).values;
-                    if (registered_values.empty()) {
+                    const auto command_enum_it = command_enum_values.find(enum_name_final);
+                    if (command_enum_it != command_enum_values.end() && command_enum_it->second == parameter.values) {
+                        reuse_existing = true;
                         break;
                     }
-
-                    const auto values_match = registered_values.size() == parameter.values.size() &&
-                                              std::ranges::all_of(parameter.values, [&](const auto &value) {
-                                                  return std::ranges::any_of(registered_values, [&](const auto &entry) {
-                                                      const auto value_index = CommandRegistry::Symbol(
-                                                                                   static_cast<std::size_t>(entry.first))
-                                                                                   .toIndex();
-                                                      return value_index < registry.enum_values_.size() &&
-                                                             registry.enum_values_.at(value_index) == value;
-                                                  });
-                                              });
-                    if (values_match) {
-                        reuse_existing = true;
+                    const auto &registered_values = registry.enums_.at(enum_index).values;
+                    if (registered_values.empty()) {
                         break;
                     }
                     enum_name_final = std::format("{}_{}", enum_name, ++i);
@@ -363,6 +354,7 @@ bool EndstoneCommandMap::registerCommand(std::shared_ptr<Command> command)
                     server_.getLogger().error("Unable to register enum '{}'.", enum_name_final);
                     throw std::runtime_error("Unreachable");
                 }
+                command_enum_values.try_emplace(enum_name_final, parameter.values);
                 data.param_type = CommandParameterDataType::Enum;
                 data.enum_name_or_postfix = it->first.c_str();
                 data.enum_or_postfix_symbol = symbol;
