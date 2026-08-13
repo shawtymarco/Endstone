@@ -27,7 +27,10 @@ CommandLexer::Token CommandLexer::next()
         return nextIdentifier();
     }
     if (isDigit(c)) {
-        return nextNumber();
+        // Command enum values are strings on the Bedrock wire and may start
+        // with a digit (for example, "1" or "2a"). Treat the complete token
+        // as an identifier so usage declarations can expose those values.
+        return nextIdentifier();
     }
 
     switch (c) {

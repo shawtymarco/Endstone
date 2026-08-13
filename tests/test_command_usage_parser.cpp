@@ -89,6 +89,28 @@ TEST_F(ParserTest, ParseCommandWithMandatoryEnumParameter)
     ASSERT_EQ(parameters[0].is_enum, true);
 }
 
+TEST_F(ParserTest, ParseCommandWithUtf8AndNumericEnumValues)
+{
+    CommandUsageParser parser(
+        "/command (상태 | 좌표동기화)<동작: CaptureMode> (1 | 2a)<지점: CaptureZone>");
+    auto result = parser.parse();
+    ASSERT_EQ(result.has_value(), true);
+
+    const auto &[command_name, parameters] = result.value();
+    ASSERT_EQ(command_name, "command");
+    ASSERT_EQ(parameters.size(), 2);
+    ASSERT_EQ(parameters[0].name, "동작");
+    ASSERT_EQ(parameters[0].type, "CaptureMode");
+    ASSERT_EQ(parameters[0].values, std::vector<std::string>({"상태", "좌표동기화"}));
+    ASSERT_EQ(parameters[0].optional, false);
+    ASSERT_EQ(parameters[0].is_enum, true);
+    ASSERT_EQ(parameters[1].name, "지점");
+    ASSERT_EQ(parameters[1].type, "CaptureZone");
+    ASSERT_EQ(parameters[1].values, std::vector<std::string>({"1", "2a"}));
+    ASSERT_EQ(parameters[1].optional, false);
+    ASSERT_EQ(parameters[1].is_enum, true);
+}
+
 TEST_F(ParserTest, ParseCommandWithOptionalEnumParameter)
 {
     CommandUsageParser parser("/command (add | set | query)[enum: EnumType]");

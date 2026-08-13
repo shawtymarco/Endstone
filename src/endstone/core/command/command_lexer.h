@@ -101,7 +101,9 @@ private:
 
     static bool isIdentifierCharacter(char c)
     {
-        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || isDigit(c) || c == '_' || c == '-';
+        const auto byte = static_cast<unsigned char>(c);
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || isDigit(c) || c == '_' || c == '-' ||
+               byte >= 0x80;
     }
 
     std::string_view value_;
